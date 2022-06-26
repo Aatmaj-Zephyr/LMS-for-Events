@@ -115,7 +115,8 @@ def printEvents():  # print events Debug function
         print("----------------------------------------------------")
 
 
-def displayEvents():  # display events from list in scope1
+def displayEvents():  
+    # display events from list in scope1
     '''
 
     :return: None
@@ -129,7 +130,8 @@ def displayEvents():  # display events from list in scope1
         pout.put_table(displaylist)
 
 
-def notBlank(data):  # check if event parameters are blank else returns False
+def notBlank(data): 
+    # check if event parameters are blank else returns False
     '''
 
     :param data: input data from pywebio
@@ -144,7 +146,8 @@ def notBlank(data):  # check if event parameters are blank else returns False
     return False
 
 
-def addEventWeb():  # add event from pywebio to list
+def addEventWeb():  
+    # add event from pywebio to list
     '''
 
     :return: none
@@ -152,7 +155,7 @@ def addEventWeb():  # add event from pywebio to list
     data = pimp.input_group("Add Event", [
         pimp.input('Enter name of the event you want to add', name='name'),
         pimp.input('Enter date of the event you want to add',
-                   name='date', type=pimp.DATE),
+                name='date', type=pimp.DATE),
         pimp.input('Enter info of the event you want to add', name='info')],
         validate=AddEventValidate
         # check if event exists or is blank to show error. error is handled by pywebio
@@ -160,8 +163,9 @@ def addEventWeb():  # add event from pywebio to list
     addEvent(name=data['name'], date=data['date'], info=data['info'])
 
 
-# check if event exists or is blank to show error. error is handled by pywebio
 def AddEventValidate(data):
+# check if event exists or is blank to show error. error is handled by pywebio
+
     '''
 
     :param data: input data from pywebio
@@ -175,8 +179,9 @@ def AddEventValidate(data):
         return ('name', 'Event already exists!')
 
 
-# check if event exists or is blank to show error. error is handled by pywebio
 def DeleteEventValidate(data):
+    # check if event exists or is blank to show error. error is handled by pywebio
+
     '''
 
     :param data: input data from pywebio
@@ -190,7 +195,8 @@ def DeleteEventValidate(data):
         return ('name', 'Event doesnt exists!')
 
 
-def exists(data):  # check if event exists
+def exists(data):  
+    # check if event exists
     '''
 
     :param data: input data from pywebio
