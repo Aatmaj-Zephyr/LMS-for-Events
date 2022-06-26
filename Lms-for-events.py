@@ -219,7 +219,7 @@ def deleteEventWeb():
     deleteEvent(name=data['name'])
 
 
-readEventlist()
+readEventlist() #Get initial list of events
 pout.put_button("Add Event", onclick=addEventWeb)  # a group of buttons
 pout.put_button("Delete Event", onclick=deleteEventWeb)  # a group of buttons
 pout.put_button("Display Events", onclick=displayEvents)  # a group of buttons
