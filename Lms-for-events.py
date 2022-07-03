@@ -8,32 +8,32 @@ open('events.csv', 'a')  # initialize the output file
 
 class Event:  # Event class
 
-    def __init__(self, name, date, info):  # constructor
-        self.name = name
-        self.date = date
-        self.info = info
+    def __init__(default, name, date, info):  # constructor
+        default.name = name
+        default.date = date
+        default.info = info
 
     # setter methods
-    def setDate(self, date):
-        self.date = date
+    def setDate(default, date):
+        default.date = date
 
-    def setInfo(self, info):  # short one line info
-        self.info = info
+    def setInfo(default, info):  # short one line info
+        default.info = info
 
     # getter methods
-    def getName(self):
-        return self.name
+    def getName(default):
+        return default.name
 
-    def getDate(self):
-        return self.date
+    def getDate(default):
+        return default.date
 
-    def getInfo(self):  # short one line info
-        return self.info
+    def getInfo(default):  # short one line info
+        return default.info
 
-    def printDetails(self):  # print details of the event
-        print(self.getName())
-        print(self.getDate())
-        print(self.getInfo())
+    def printDetails(default):  # print details of the event
+        print(default.getName())
+        print(default.getDate())
+        print(default.getInfo())
 
 
 Eventlist = []  # GLOBAL VARIABLE
