@@ -1,9 +1,10 @@
-# mporting necessary libraries
+# importing necessary libraries
 import pywebio.output as pout
 import pywebio.input as pimp
 import csv
 
-open('events.csv', 'w') # initialize the output file
+open('events.csv', 'a')  # initialize the output file
+
 
 class Event:  # Event class
 
@@ -98,6 +99,7 @@ def editEvent(name, date, info):  # edit event info (Never used)
     '''
     Editing will be carried out as deleting the event and adding a new one
     '''
+   # Editing the event.
     for i in Eventlist:
         if i.getName() == name:
             i.setDate(date)
@@ -115,7 +117,7 @@ def printEvents():  # print events Debug function
         print("----------------------------------------------------")
 
 
-def displayEvents():  
+def displayEvents():
     # display events from list in scope1
     '''
 
@@ -130,7 +132,7 @@ def displayEvents():
         pout.put_table(displaylist)
 
 
-def notBlank(data): 
+def notBlank(data):
     # check if event parameters are blank else returns False
     '''
 
@@ -146,7 +148,7 @@ def notBlank(data):
     return False
 
 
-def addEventWeb():  
+def addEventWeb():
     # add event from pywebio to list
     '''
 
@@ -164,8 +166,7 @@ def addEventWeb():
 
 
 def AddEventValidate(data):
-# check if event exists or is blank to show error. error is handled by pywebio
-
+    # check if event exists or is blank to show error. error is handled by pywebio
     '''
 
     :param data: input data from pywebio
@@ -181,7 +182,6 @@ def AddEventValidate(data):
 
 def DeleteEventValidate(data):
     # check if event exists or is blank to show error. error is handled by pywebio
-
     '''
 
     :param data: input data from pywebio
@@ -195,12 +195,12 @@ def DeleteEventValidate(data):
         return ('name', 'Event doesnt exists!')
 
 
-def exists(data):  
+def exists(data):
     # check if event exists
     '''
 
     :param data: input data from pywebio
-    :return: True if name already in Eventlist and false if name nt found in Eventlist
+    :return: True if name already in Eventlist and false if name not found in Eventlist
     '''
     exists = False
     for i in Eventlist:
@@ -225,7 +225,7 @@ def deleteEventWeb():
     deleteEvent(name=data['name'])
 
 
-readEventlist() #Get initial list of events
+readEventlist()  # Get initial list of events
 pout.put_button("Add Event", onclick=addEventWeb)  # a group of buttons
 pout.put_button("Delete Event", onclick=deleteEventWeb)  # a group of buttons
 pout.put_button("Display Events", onclick=displayEvents)  # a group of buttons
