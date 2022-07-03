@@ -2,8 +2,10 @@
 import pywebio.output as pout
 import pywebio.input as pimp
 import csv
+import base64
+import os
 
-open('events.csv', 'w')  # initialize the output file
+open('events.csv', 'a')  # initialize the output file
 
 
 class Event:  # Event class
@@ -52,7 +54,7 @@ def saveEventlist():
     Erases file as this is a very short list and not a huge database file.
     :return: none
     '''
-    with open('events.csv', 'a') as csvfile:
+    with open('events.csv', 'w') as csvfile:
         csvfile.truncate(0)
         writer = csv.writer(csvfile)
         for i in Eventlist:
@@ -99,7 +101,7 @@ def editEvent(name, date, info):  # edit event info (Never used)
     '''
     Editing will be carried out as deleting the event and adding a new one
     '''
-    # Editing the event.
+   # Editing the event.
     for i in Eventlist:
         if i.getName() == name:
             i.setDate(date)
@@ -124,7 +126,7 @@ def displayEvents():
     :return: None
     '''
     displaylist = [['Name of the event', 'Date of the event',
-                    'Information']]  # lost to feed in put_table function contains a list of list.
+                    'Information']]  # lot to feed in put_table function contains a list of list.
     for i in Eventlist:
         displaylist.append([i.getName(), i.getDate(), i.getInfo()])
     pout.clear("scope1")  # clear prev display
@@ -154,16 +156,15 @@ def addEventWeb():
 
     :return: none
     '''
-    if(acess_modifier!=0):
-        data = pimp.input_group("Add Event", [
-            pimp.input('Enter name of the event you want to add', name='name'),
-            pimp.input('Enter date of the event you want to add',
-                    name='date', type=pimp.DATE),
-            pimp.input('Enter info of the event you want to add', name='info')],
-            validate=AddEventValidate
-            # check if event exists or is blank to show error. error is handled by pywebio
-        )
-        addEvent(name=data['name'], date=data['date'], info=data['info'])
+    data = pimp.input_group("Add Event", [
+        pimp.input('Enter Event Name',placeholder='Pls Enter Event Name', name='name' ,required=True),
+        pimp.input('Enter Date of Event',
+                name='date', type=pimp.DATE,required=True),
+        pimp.input('Enter info about the event', name='info',required=True,placeholder='Pls Enter Event Details')],
+        validate=AddEventValidate
+        # check if event exists or is blank to show error. error is handled by pywebio
+    )
+    addEvent(name=data['name'], date=data['date'], info=data['info'])
 
 
 def AddEventValidate(data):
@@ -218,35 +219,80 @@ def deleteEventWeb():
 
     Deleted events from the web using the name parameter.
     '''
-    if(acess_modifier!=0):
-        data = pimp.input_group("Delete Event", [
-            pimp.input('Enter name of the event you want to delete', name='name')],
-            validate=DeleteEventValidate
-            # check if event exists or is blank to show error. error is handled by pywebio
-        )
-        deleteEvent(name=data['name'])
+    
+    data = pimp.input_group("Delete Event", [
+        pimp.input('Enter name of the event you want to delete', name='name')],
+        validate=DeleteEventValidate
+        # check if event exists or is blank to show error. error is handled by pywebio
+    )
+    deleteEvent(name=data['name'])
 def Login():
+    global data2
+    pout.remove('scopeLogReg')
+
+    
     data2 = pimp.input_group("Login", [
-            pimp.input('Enter Username', name='username'),
+            pimp.input('Enter Username', name='username',required=True),
             pimp.input('Enter Password',
-                    name='password', type=pimp.PASSWORD),
-            ]
-            # check if event exists or is blank to show error. error is handled by pywebio
-        )
+                    name='password', type=pimp.PASSWORD,required=True)
+            ],
+            validate=check,
+            cancelable=True
+        
+            )
+    if((data2)==None):
+        restart()
+    
+    
 def Register():
-    data3 = pimp.input_group("Login", [
-            pimp.input('Enter Username', name='username'),
+    pout.remove('scopeLogReg')
+    
+    
+    data3 = pimp.input_group("Register", [
+            pimp.input('Enter Username', name='username',required=True),
             pimp.input('Enter Password',
-                    name='password', type=pimp.PASSWORD),
+                        name='password', type=pimp.PASSWORD,required=True),
             pimp.input('Enter Verif Code',
-                    name='code')
-            ]
-            # check if event exists or is blank to show error. error is handled by pywebio
-        )
-acess_modifier=1
+                        name='code',required=True),
+            ],
+            validate=is_valid,
+            cancelable=True
+            
+            )
+    if((data3)==None):
+        restart()
+def is_valid(data3):
+    if(len(data3['username'].split("."))==3):
+        if((data3['username'].split("@"))[1]=="somaiya.edu"):
+            pass
+        else:
+            return('username',"Invalid Username")
+    else:
+            return('username',"Invalid Username")
+    if(len(data3['password'])>=10):
+        if((data3['password']).count("@")>=1):
+            pass
+        else:
+            return('password',"Password must have at least one \"@\" symbol ")
+    else:
+        return('password',"Password must be at least 10 characters")
+    
+def check(data2):
+    b=2
+def restart():
+    pout.remove('scopeLogReg')
+    pout.remove('scopeLogReg2')
+    with pout.use_scope('scopeLogReg'):
+        pout.put_button("Login", onclick=Login)  # a group of buttons
+        pout.put_button("Register", onclick=Register)  # a group of buttons
+
+
+
 readEventlist()  # Get initial list of events
-pout.put_button("Login", onclick=Login)  # a group of buttons
-pout.put_button("Register", onclick=Register)  # a group of buttons
-pout.put_button("Add Event", onclick=addEventWeb)  # a group of buttons
-pout.put_button("Delete Event", onclick=deleteEventWeb)  # a group of buttons
-pout.put_button("Display Events", onclick=displayEvents)  # a group of buttons
+with pout.use_scope('scopeLogReg'):
+    pout.put_button("Login", onclick=Login)  # a group of buttons
+    pout.put_button("Register", onclick=Register)  # a group of buttons
+"""with pout.use_scope('scopeV',clear=True):
+    pout.put_button("Add Event", onclick=addEventWeb)  # a group of buttons
+    pout.put_button("Delete Event", onclick=deleteEventWeb)  # a group of buttons
+    pout.put_button("Display Events", onclick=displayEvents)  # a group of buttons"""
