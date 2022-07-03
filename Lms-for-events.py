@@ -3,7 +3,7 @@ import pywebio.output as pout
 import pywebio.input as pimp
 import csv
 
-open('events.csv', 'a')  # initialize the output file
+open('events.csv', 'w')  # initialize the output file
 
 
 class Event:  # Event class
@@ -52,7 +52,7 @@ def saveEventlist():
     Erases file as this is a very short list and not a huge database file.
     :return: none
     '''
-    with open('events.csv', 'w') as csvfile:
+    with open('events.csv', 'a') as csvfile:
         csvfile.truncate(0)
         writer = csv.writer(csvfile)
         for i in Eventlist:
@@ -99,7 +99,7 @@ def editEvent(name, date, info):  # edit event info (Never used)
     '''
     Editing will be carried out as deleting the event and adding a new one
     '''
-   # Editing the event.
+    # Editing the event.
     for i in Eventlist:
         if i.getName() == name:
             i.setDate(date)
