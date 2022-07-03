@@ -154,15 +154,16 @@ def addEventWeb():
 
     :return: none
     '''
-    data = pimp.input_group("Add Event", [
-        pimp.input('Enter name of the event you want to add', name='name'),
-        pimp.input('Enter date of the event you want to add',
-                name='date', type=pimp.DATE),
-        pimp.input('Enter info of the event you want to add', name='info')],
-        validate=AddEventValidate
-        # check if event exists or is blank to show error. error is handled by pywebio
-    )
-    addEvent(name=data['name'], date=data['date'], info=data['info'])
+    if(acess_modifier!=0):
+        data = pimp.input_group("Add Event", [
+            pimp.input('Enter name of the event you want to add', name='name'),
+            pimp.input('Enter date of the event you want to add',
+                    name='date', type=pimp.DATE),
+            pimp.input('Enter info of the event you want to add', name='info')],
+            validate=AddEventValidate
+            # check if event exists or is blank to show error. error is handled by pywebio
+        )
+        addEvent(name=data['name'], date=data['date'], info=data['info'])
 
 
 def AddEventValidate(data):
@@ -217,15 +218,35 @@ def deleteEventWeb():
 
     Deleted events from the web using the name parameter.
     '''
-    data = pimp.input_group("Delete Event", [
-        pimp.input('Enter name of the event you want to delete', name='name')],
-        validate=DeleteEventValidate
-        # check if event exists or is blank to show error. error is handled by pywebio
-    )
-    deleteEvent(name=data['name'])
-
-
+    if(acess_modifier!=0):
+        data = pimp.input_group("Delete Event", [
+            pimp.input('Enter name of the event you want to delete', name='name')],
+            validate=DeleteEventValidate
+            # check if event exists or is blank to show error. error is handled by pywebio
+        )
+        deleteEvent(name=data['name'])
+def Login():
+    data2 = pimp.input_group("Login", [
+            pimp.input('Enter Username', name='username'),
+            pimp.input('Enter Password',
+                    name='password', type=pimp.PASSWORD),
+            ]
+            # check if event exists or is blank to show error. error is handled by pywebio
+        )
+def Register():
+    data3 = pimp.input_group("Login", [
+            pimp.input('Enter Username', name='username'),
+            pimp.input('Enter Password',
+                    name='password', type=pimp.PASSWORD),
+            pimp.input('Enter Verif Code',
+                    name='code')
+            ]
+            # check if event exists or is blank to show error. error is handled by pywebio
+        )
+acess_modifier=1
 readEventlist()  # Get initial list of events
+pout.put_button("Login", onclick=Login)  # a group of buttons
+pout.put_button("Register", onclick=Register)  # a group of buttons
 pout.put_button("Add Event", onclick=addEventWeb)  # a group of buttons
 pout.put_button("Delete Event", onclick=deleteEventWeb)  # a group of buttons
 pout.put_button("Display Events", onclick=displayEvents)  # a group of buttons
