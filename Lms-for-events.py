@@ -72,8 +72,8 @@ def readLoginlist():
         for i in csvfile:
             
             i = i.split(",")
-            #if(len(i)==3):
-            Loginlist.append(Login(name=i[0], Pass=i[1]))
+            if(len(i)==2):
+                Loginlist.append(Login(name=i[0], Pass=i[1]))
         csvfile.close()
 
 def saveEventlist():
@@ -138,14 +138,21 @@ def deleteEvent(name):  # delete event from list
             Eventlist.remove(i)
     saveEventlist()  # save to database
 
-def UserCheck(name,Pass):
+def UserCheck(data2):
     print("in usercheck")
+    name=data2['username']
+    Pass=data2['password']
     for i in Loginlist:
+        print(i)
         if i.getName2() == name and i.getPass() == Pass:
             Continue()
         else:
-            restart()
-            #Continue()
+            if i.getName2()!=name:
+                return ('username',"Username not found")
+            else:
+                print(i.getPass())
+                print(Pass)
+                return('password',"Invalid Password")
             
         
 
@@ -322,9 +329,6 @@ def Login_func():
             )
     if((data2)==None):
         restart()
-    else:
-        UserCheck(name=data2['username'],Pass=data2['password'])
-        #Continue()
 
     
 def Register():
