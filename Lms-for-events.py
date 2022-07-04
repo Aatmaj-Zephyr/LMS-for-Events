@@ -1,10 +1,8 @@
 # importing necessary libraries
+from ast import Pass
 import pywebio.output as pout
 import pywebio.input as pimp
 import csv
-
-open('events.csv', 'w')  # initialize the output file
-
 
 class Event:  # Event class
 
@@ -13,9 +11,9 @@ class Event:  # Event class
         default.date = date
         default.info = info
 
-    # setter methods
+    ''' # setter methods
     def setDate(default, date):
-        default.date = date
+        default.date = date'''
 
     def setInfo(default, info):  # short one line info
         default.info = info
@@ -35,17 +33,48 @@ class Event:  # Event class
         print(default.getDate())
         print(default.getInfo())
 
+class Login:
+    def __init__(self, name, Pass):  # constructor
+        self.name = name
+        self.Pass = Pass
+        print("Hello")
 
+    ''' # setter methods
+    def setDate(default, date):
+        default.date = date'''    
+
+    # getter methods
+    def getName2(self):
+        return self.name
+
+    def getPass(self):
+        return self.Pass
+
+    
+    def printDetails(self):  # print details of the Login
+        print(self.getName2())
+        print(self.getPass())
+        
+Loginlist = []  #GLOBAL VARIABLE
 Eventlist = []  # GLOBAL VARIABLE
-
 
 def readEventlist():
     with open('events.csv', 'r') as csvfile:
         for i in csvfile:
+            
             i = i.split(",")
-            Eventlist.append(Event(name=i[0], date=i[1], info=str(i[2])))
+            if(len(i)==3):
+                Eventlist.append(Event(name=i[0], date=i[1], info=str(i[2])))
         csvfile.close()
 
+def readLoginlist():
+    with open('Login.csv', 'r') as csvfile:
+        for i in csvfile:
+            
+            i = i.split(",")
+            #if(len(i)==3):
+            Loginlist.append(Login(name=i[0], Pass=i[1]))
+        csvfile.close()
 
 def saveEventlist():
     '''
@@ -59,6 +88,17 @@ def saveEventlist():
             writer.writerow([i.getName(), i.getDate(), i.getInfo()])
         csvfile.close()
 
+def saveLoginlist():
+    '''
+    Erases file as this is a very short list and not a huge database file.
+    :return: none
+    '''
+    with open('Login.csv', 'a') as csvfile:
+        csvfile.truncate(0)
+        writer = csv.writer(csvfile)
+        for i in Loginlist:
+            writer.writerow([i.getName2(), i.getPass()])
+        csvfile.close()
 
 def addEvent(name, date, info):  # add event to list
     '''
@@ -72,6 +112,17 @@ def addEvent(name, date, info):  # add event to list
     Eventlist.append(Event(name=name, date=date, info=info))
     saveEventlist()  # save to database
 
+def addUser(name, Pass):  # add event to list
+    '''
+
+    :param name: name of event
+    :param date: date of event
+    :param info: info about event
+    :return: none
+    '''
+
+    Loginlist.append(Login(name=name, Pass=Pass))
+    saveLoginlist()  # save to database
 
 def deleteEvent(name):  # delete event from list
     '''
@@ -86,6 +137,17 @@ def deleteEvent(name):  # delete event from list
         if i.getName() == name:
             Eventlist.remove(i)
     saveEventlist()  # save to database
+
+def UserCheck(name,Pass):
+    print("in usercheck")
+    for i in Loginlist:
+        if i.getName2() == name and i.getPass() == Pass:
+            Continue()
+        else:
+            restart()
+            #Continue()
+            
+        
 
 
 def editEvent(name, date, info):  # edit event info (Never used)
@@ -118,6 +180,7 @@ def printEvents():  # print events Debug function
 
 
 def displayEvents():
+    pout.clear("scopeV")
     # display events from list in scope1
     '''
 
@@ -130,6 +193,9 @@ def displayEvents():
     pout.clear("scope1")  # clear prev display
     with pout.use_scope('scope1'):
         pout.put_table(displaylist)
+        pout.put_button("Back", onclick=Continue).style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;')
+    
+    
 
 
 def notBlank(data):
@@ -149,6 +215,7 @@ def notBlank(data):
 
 
 def addEventWeb():
+    pout.remove("scopeV")
     # add event from pywebio to list
     '''
 
@@ -159,10 +226,14 @@ def addEventWeb():
         pimp.input('Enter Date of Event',
                 name='date', type=pimp.DATE,required=True),
         pimp.input('Enter info about the event', name='info',required=True,placeholder='Pls Enter Event Details')],
-        validate=AddEventValidate
+        validate=AddEventValidate,cancelable=True
         # check if event exists or is blank to show error. error is handled by pywebio
     )
-    addEvent(name=data['name'], date=data['date'], info=data['info'])
+    if(data==None):
+        Continue()
+    else:
+        addEvent(name=data['name'], date=data['date'], info=data['info'])
+        Continue()
 
 
 def AddEventValidate(data):
@@ -178,6 +249,7 @@ def AddEventValidate(data):
         return notBlank(data)  # must return a tuple of (name, error)
     if (exists(data) == True):  # if already present then return error message
         return ('name', 'Event already exists!')
+    pout.scroll_to('scopeV')
 
 
 def DeleteEventValidate(data):
@@ -211,6 +283,7 @@ def exists(data):
 
 
 def deleteEventWeb():
+    pout.remove("scopeV")
     '''
 
     :return: None
@@ -220,12 +293,21 @@ def deleteEventWeb():
     
     data = pimp.input_group("Delete Event", [
         pimp.input('Enter name of the event you want to delete', name='name')],
-        validate=DeleteEventValidate
+        validate=DeleteEventValidate,cancelable=True
         # check if event exists or is blank to show error. error is handled by pywebio
     )
-    deleteEvent(name=data['name'])
-def Login():
-    global data2
+    if(data==None):
+        Continue()
+    else:
+        deleteEvent(name=data['name'])
+    with pout.use_scope('scopeV',clear=True):
+        pout.put_row([
+            pout.put_button("Add Event", onclick=addEventWeb),  # a group of buttons
+            pout.put_button("Delete Event", onclick=deleteEventWeb),  # a group of buttons
+            pout.put_button("Display Events", onclick=displayEvents)]).style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;')  # a group of buttons
+
+def Login_func():
+
     pout.remove('scopeLogReg')
 
     
@@ -240,11 +322,14 @@ def Login():
             )
     if((data2)==None):
         restart()
-    
+    else:
+        UserCheck(name=data2['username'],Pass=data2['password'])
+        #Continue()
+
     
 def Register():
     pout.remove('scopeLogReg')
-    
+    pout.scroll_to('scopeV')
     
     data3 = pimp.input_group("Register", [
             pimp.input('Enter Username', name='username',required=True),
@@ -259,6 +344,10 @@ def Register():
             )
     if((data3)==None):
         restart()
+    else:
+        addUser(name=data3['username'], Pass=data3['password'])
+        Continue()
+
 def is_valid(data3):
     if(len(data3['username'].split("."))==3):
         if((data3['username'].split("@"))[1]=="somaiya.edu"):
@@ -274,23 +363,41 @@ def is_valid(data3):
             return('password',"Password must have at least one \"@\" symbol ")
     else:
         return('password',"Password must be at least 10 characters")
+    if(data3['code']=="1@3$5^7*9)"):
+        pass
+    else:
+        return('code',"Invalid Code")
     
 def check(data2):
     b=2
 def restart():
-    pout.remove('scopeLogReg')
-    pout.remove('scopeLogReg2')
+    #pout.remove('scopeLogReg')
+    #pout.remove('scopeLogReg2')
     with pout.use_scope('scopeLogReg'):
-        pout.put_button("Login", onclick=Login)  # a group of buttons
-        pout.put_button("Register", onclick=Register)  # a group of buttons
+        pout.put_row([
+            pout.put_button("Login", onclick=Login_func),  # a group of buttons
+            pout.put_button("Register", onclick=Register)]).style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;')  # a group of buttons
 
+def Continue():
+    print("in continue")
+    pout.remove('scope1')
+    with pout.use_scope('scopeV'):
+        pout.put_row([
+            pout.put_button("Add Event", onclick=addEventWeb),  # a group of buttons
+            pout.put_button("Delete Event", onclick=deleteEventWeb),  # a group of buttons
+            pout.put_button("Display Events", onclick=displayEvents)]).style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;') # a group of buttons
 
 
 readEventlist()  # Get initial list of events
+readLoginlist()
+print(Loginlist)
 with pout.use_scope('scopeLogReg'):
-    pout.put_button("Login", onclick=Login)  # a group of buttons
-    pout.put_button("Register", onclick=Register)  # a group of buttons
+    
+    pout.put_row([
+        pout.put_button("Login", onclick=Login_func,color='success'),  # a group of buttons
+        pout.put_button("Register", onclick=Register,color = 'warning')],size='30%').style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;font-size:80px;margin-color:solid green')  # a group of buttons
 """with pout.use_scope('scopeV',clear=True):
     pout.put_button("Add Event", onclick=addEventWeb)  # a group of buttons
     pout.put_button("Delete Event", onclick=deleteEventWeb)  # a group of buttons
     pout.put_button("Display Events", onclick=displayEvents)  # a group of buttons"""
+        
