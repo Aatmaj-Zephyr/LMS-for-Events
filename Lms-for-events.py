@@ -1,5 +1,4 @@
 # importing necessary libraries
-
 import pywebio.output as pout
 import pywebio.input as pimp
 import csv
@@ -72,8 +71,8 @@ def readLoginlist():
         for i in csvfile:
             
             i = i.split(",")
-            #if(len(i)==3):
-            Loginlist.append(Login(name=i[0], Pass=i[1]))
+            if(len(i)==2):
+                Loginlist.append(Login(name=i[0], Pass=i[1]))
         csvfile.close()
 
 def saveEventlist():
@@ -138,14 +137,27 @@ def deleteEvent(name):  # delete event from list
             Eventlist.remove(i)
     saveEventlist()  # save to database
 
-def UserCheck(name,Pass):
+def UserCheck(data2):
     print("in usercheck")
+    name=data2['username']
+    Pass=data2['password']
+    j=0
     for i in Loginlist:
-        if i.getName2() == name and i.getPass() == Pass:
-            Continue()
-        else:
-            restart()
-            #Continue()
+        print(i.getPass())
+        print(i.getName2())
+        
+        if i.getName2() == name :
+            j=1
+            if (i.getPass())[0:-1] == Pass:
+                Continue()
+                j=2
+        if(j==1 or j==2):
+            break
+    
+    if(j==0):
+        return('username','username not found')
+    elif (j==1):
+        return('password','Invalid password')
             
         
 
@@ -193,7 +205,7 @@ def displayEvents():
     pout.clear("scope1")  # clear prev display
     with pout.use_scope('scope1'):
         pout.put_table(displaylist)
-        pout.put_button("Back", onclick=Continue,color='secondary').style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;')
+        pout.put_button("Back", onclick=Continue).style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;')
     
     
 
@@ -300,7 +312,11 @@ def deleteEventWeb():
         Continue()
     else:
         deleteEvent(name=data['name'])
-        Continue()
+    with pout.use_scope('scopeV',clear=True):
+        pout.put_row([
+            pout.put_button("Add Event", onclick=addEventWeb),  # a group of buttons
+            pout.put_button("Delete Event", onclick=deleteEventWeb),  # a group of buttons
+            pout.put_button("Display Events", onclick=displayEvents)]).style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;')  # a group of buttons
 
 def Login_func():
 
@@ -312,15 +328,12 @@ def Login_func():
             pimp.input('Enter Password',
                     name='password', type=pimp.PASSWORD,required=True)
             ],
-            validate=check,
+            validate=UserCheck,
             cancelable=True
         
             )
     if((data2)==None):
         restart()
-    else:
-        UserCheck(name=data2['username'],Pass=data2['password'])
-        #Continue()
 
     
 def Register():
@@ -340,9 +353,6 @@ def Register():
             )
     if((data3)==None):
         restart()
-    else:
-        addUser(name=data3['username'], Pass=data3['password'])
-        Continue()
 
 def is_valid(data3):
     if(len(data3['username'].split("."))==3):
@@ -354,7 +364,9 @@ def is_valid(data3):
             return('username',"Invalid Username")
     if(len(data3['password'])>=10):
         if((data3['password']).count("@")>=1):
-            pass
+            Pass2=(data3['password']).replace("\n","")
+            addUser(name=data3['username'], Pass=Pass2)
+            Continue()
         else:
             return('password',"Password must have at least one \"@\" symbol ")
     else:
@@ -363,26 +375,34 @@ def is_valid(data3):
         pass
     else:
         return('code',"Invalid Code")
-    
-def check(data2):
-    b=2
+
 def restart():
     #pout.remove('scopeLogReg')
-    #pout.remove('scopeLogReg2')
+    pout.remove('scope1')
     with pout.use_scope('scopeLogReg'):
         pout.put_row([
             pout.put_button("Login", onclick=Login_func),  # a group of buttons
-            pout.put_button("Register", onclick=Register)]).style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;')  # a group of buttons
+            pout.put_button("Register", onclick=Register),
+            pout.put_button("Display Events",onclick=displayEvents2)]).style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;')  # a group of buttons
 
 def Continue():
     print("in continue")
     pout.remove('scope1')
     with pout.use_scope('scopeV'):
         pout.put_row([
-            pout.put_button("Add Event", onclick=addEventWeb,color='info'),  # a group of buttons
-            pout.put_button("Delete Event", onclick=deleteEventWeb,color='warning'),  # a group of buttons
+            pout.put_button("Add Event", onclick=addEventWeb),  # a group of buttons
+            pout.put_button("Delete Event", onclick=deleteEventWeb),  # a group of buttons
             pout.put_button("Display Events", onclick=displayEvents)]).style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;') # a group of buttons
 
+def displayEvents2():
+    pout.remove('scopeLogReg')
+    displaylist = [['Name of the event', 'Date of the event',
+                    'Information']]  # lot to feed in put_table function contains a list of list.
+    for i in Eventlist:
+        displaylist.append([i.getName(), i.getDate(), i.getInfo()])
+    with pout.use_scope('scope1'):
+        pout.put_table(displaylist)
+        pout.put_button("Back", onclick=restart).style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;')
 
 readEventlist()  # Get initial list of events
 readLoginlist()
@@ -391,9 +411,7 @@ with pout.use_scope('scopeLogReg'):
     
     pout.put_row([
         pout.put_button("Login", onclick=Login_func,color='success'),  # a group of buttons
-        pout.put_button("Register", onclick=Register,color = 'warning')],size='30%').style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;font-size:80px;margin-color:solid green')  # a group of buttons
-"""with pout.use_scope('scopeV',clear=True):
-    pout.put_button("Add Event", onclick=addEventWeb)  # a group of buttons
-    pout.put_button("Delete Event", onclick=deleteEventWeb)  # a group of buttons
-    pout.put_button("Display Events", onclick=displayEvents)  # a group of buttons"""
+        pout.put_button("Register", onclick=Register,color = 'warning'),
+        pout.put_button("Display Events",onclick=displayEvents2)
+        ],size='30%').style('font-family: "Lucida Console", "Courier New", monospace;font-weight:bold;font-size:80px;margin-color:solid green')  # a group of buttons
         
