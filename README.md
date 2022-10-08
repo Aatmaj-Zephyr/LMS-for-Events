@@ -32,3 +32,14 @@ Firstly we created 2 classes Login and Event and then used getter setter method 
 • There are 2 separate csv files used …. 1 is Login.csv for login details and other is events.csv for event details.
 
 • This csv is written read and saved using user built functions namely readEventlist,saveEventlist,readLoginlist,saveLoginlist.
+
+
+
+______
+
+#### Contributors
+
+<a href="https://github.com/Aatmaj-Zephyr/LMS-for-Events/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Aatmaj-Zephyr/LMS-for-Events" />
+</a>
+
